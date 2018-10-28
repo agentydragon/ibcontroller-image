@@ -24,11 +24,14 @@ RUN wget https://github.com/ib-controller/ib-controller/releases/download/3.4.0/
 
 # Install IB API.
 RUN install_clean python3-setuptools python3-wheel python3-pip && \
+    cd ~ && \
     wget http://interactivebrokers.github.io/downloads/twsapi_macunix.973.07.zip && \
     unzip twsapi_macunix.973.07.zip && \
     cd IBJts/source/pythonclient && \
     python3 setup.py bdist_wheel && \
-    python3 -m pip install --user --upgrade dist/ibapi-9.73.7-py3-none-any.whl
+    python3 -m pip install --user --upgrade dist/ibapi-9.73.7-py3-none-any.whl && \
+    cd ~ && \
+    rm -r IBJts twsapi_macunix.973.07.zip
 
 RUN rm ~/IBController/**/*.bat
 
