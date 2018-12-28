@@ -26,3 +26,7 @@ docker push agentydragon/ibcontroller
 ```
 docker run -e "IB_LOGIN_ID=<...>" -e "IB_PASSWORD=<...>" -it agentydragon/ibcontroller
 ```
+
+## TODOs
+
+* Is gtk-2 really needed? I only added it when I forgot a DISPLAY=:1 line.
