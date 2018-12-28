@@ -1,31 +1,34 @@
 FROM phusion/baseimage
 
 CMD ["/sbin/my_init"]
-RUN apt-get update && install_clean wget bzip2 unzip xvfb libxrender1 \
-    libxtst6 libxi6 libglib2.0-dev xterm x11vnc
 RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
     add-apt-repository -y ppa:webupd8team/java && \
-    apt-get update && install_clean oracle-java8-installer
+    apt-get update && \
+    apt-get upgrade -y && \
+    install_clean wget bzip2 unzip xvfb libxrender1 \
+    libxtst6 libxi6 libglib2.0-dev xterm x11vnc oracle-java8-installer \
+    python3-setuptools python3-wheel python3-pip gtk2.0 lsof net-tools
 
-# Install IB Gateway: Installs to ~/Jts
-RUN wget https://download2.interactivebrokers.com/installers/ibgateway/latest-standalone/ibgateway-latest-standalone-linux-x64.sh && \
-    chmod a+x ibgateway-latest-standalone-linux-x64.sh && \
-    mv ibgateway-latest-standalone-linux-x64.sh ~ && \
-    cd ~ && \
-    (echo n | ./ibgateway-latest-standalone-linux-x64.sh) && \
-    rm ibgateway-latest-standalone-linux-x64.sh
-# n = answer "no" to whether the gateway should start immediately
+# Copy over installation files downloaded by ./download.sh.
+ADD tws-stable-standalone-linux-x64.sh /root/tws-stable-standalone-linux-x64.sh
+ADD IBController-3.4.0.zip /root/IBController-3.4.0.zip
+ADD twsapi_macunix.973.07.zip /root/twsapi_macunix.973.07.zip
+
+# Install IB Trader Workstation: Installs to ~/Jts
+RUN cd ~ && \
+    chmod a+x tws-stable-standalone-linux-x64.sh && \
+    (echo n | ./tws-stable-standalone-linux-x64.sh) && \
+    rm tws-stable-standalone-linux-x64.sh
+# n = answer "no" to whether should start immediately
 
 # Install IB Controller: Installs to ~/IBController
-RUN wget https://github.com/ib-controller/ib-controller/releases/download/3.4.0/IBController-3.4.0.zip && \
+RUN cd ~ && \
     unzip IBController-3.4.0.zip -d ~/IBController && \
     chmod -R 777 ~/IBController && \
     rm IBController-3.4.0.zip
 
 # Install IB API.
-RUN install_clean python3-setuptools python3-wheel python3-pip && \
-    cd ~ && \
-    wget http://interactivebrokers.github.io/downloads/twsapi_macunix.973.07.zip && \
+RUN cd ~ && \
     unzip twsapi_macunix.973.07.zip && \
     cd IBJts/source/pythonclient && \
     python3 setup.py bdist_wheel && \
