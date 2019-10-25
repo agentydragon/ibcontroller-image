@@ -24,7 +24,29 @@ docker push agentydragon/ibcontroller
 ## Running
 
 ```
-docker run -e "IB_LOGIN_ID=<...>" -e "IB_PASSWORD=<...>" -it agentydragon/ibcontroller
+docker run -e "IB_LOGIN_ID=<...>" -e "IB_PASSWORD=<...>" --name derg -it agentydragon/ibcontroller
+```
+
+### Debug and connect to UI
+
+To run with attaching port for VNC:
+
+```
+docker run -e "IB_LOGIN_ID=<...>" -e "IB_PASSWORD=<...>" --name derg -P -it agentydragon/ibcontroller
+```
+
+Use `docker ps` to find the port mapped to 5900. Connect to it over VNC.
+
+### Exec
+
+```
+docker exec -it derg python3 /root/read_snapshot.py --port=7496
+```
+
+### Cleanup
+
+```
+docker rm derg
 ```
 
 ## TODOs
